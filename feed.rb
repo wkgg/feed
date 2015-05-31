@@ -6,7 +6,7 @@ def batch_send_requests requests
   response = RestClient.post( 
     'https://api.leancloud.cn/1.1/batch', 
     requests,
-    :content_type => "application/json", :'x-avoscloud-request-sign' => "2c12a09cca51ff10ef42c190dd943bc6,1432918335", :'X-AVOSCloud-Application-Id' => '0erqjpcv2cbkk24t75wrb7l4n11avy0u1xl8fmkxi11nhlr9')
+    :content_type => "application/json", :'x-avoscloud-request-sign' => ENV['X_AVOSCLOUD_REQUEST_SIGN'], :'X-AVOSCloud-Application-Id' => ENV['X_AVOSCLOUD_APPLICATION_ID'])
 end
 
 def build_requests insights
