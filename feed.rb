@@ -1,12 +1,15 @@
 require 'rss'
 require 'json'
 require 'rest-client'
+require 'pry'
 
 def batch_send_requests requests
   response = RestClient.post( 
     'https://api.leancloud.cn/1.1/batch', 
     requests,
-    :content_type => "application/json", :'x-avoscloud-request-sign' => ENV['X_AVOSCLOUD_REQUEST_SIGN'], :'X-AVOSCloud-Application-Id' => ENV['X_AVOSCLOUD_APPLICATION_ID'])
+    :content_type => "application/json", :'x-avoscloud-request-sign' => ENV['X_AVOSCLOUD_REQUEST_SIGN'], :'X-AVOSCloud-Application-Id' => ENV['X_AVOSCLOUD_APPLICATION_ID']){ |response, request, result, &block|
+      puts response
+    }
 end
 
 def build_requests insights
@@ -14,7 +17,7 @@ def build_requests insights
   insights.each do|insight|
     request = {}
     request["method"] = "POST"
-    request["path"] = "/1.1/classes/insights"
+    request["path"] = "/1.1/classes/Post"
     request["body"] = insight
 
     data.push request
@@ -29,9 +32,13 @@ insights = []
 rss.items.each do |item|
   hash = {}
   hash['title'] = item.title
-  hash['link'] = item.link
-  hash['putDate'] = item.pubDate
-  hash['content_encoded'] = item.content_encoded
+  hash['publishDate'] = {
+                           "__type" => "Date",
+                           "iso" => item.pubDate.iso8601.sub(/\+08:00/, ".123Z")
+                        }
+  hash['content'] = item.content_encoded
+  hash['guid'] = item.guid.content
+  hash['tags'] = item.categories.map {|category| category.content}
 
   insights.push hash
 end
