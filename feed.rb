@@ -39,6 +39,7 @@ rss.items.each do |item|
   hash['content'] = item.content_encoded
   hash['guid'] = item.guid.content
   hash['tags'] = item.categories.map {|category| category.content}
+  hash['description'] = item.description
 
   insights.push hash
 end
