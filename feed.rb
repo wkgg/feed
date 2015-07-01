@@ -1,15 +1,23 @@
 require 'rss'
 require 'json'
 require 'rest-client'
+require 'yaml'
 require 'pry'
 
 def batch_send_requests requests
+  config = get_avoscloud_config
   response = RestClient.post( 
     'https://api.leancloud.cn/1.1/batch', 
     requests,
-    :content_type => "application/json", :'x-avoscloud-request-sign' => ENV['X_AVOSCLOUD_REQUEST_SIGN'], :'X-AVOSCloud-Application-Id' => ENV['X_AVOSCLOUD_APPLICATION_ID']){ |response, request, result, &block|
+    :content_type => "application/json", :'x-avoscloud-request-sign' => config['x_avoscloud_request_sign'], :'X-AVOSCloud-Application-Id' => config['x_avoscloud_application_id']){ |response, request, result, &block|
       puts response
     }
+end
+
+def get_avoscloud_config
+  File.open("config.yaml", "r") do |object|
+    config = YAML::load(object)
+  end
 end
 
 def build_requests insights
