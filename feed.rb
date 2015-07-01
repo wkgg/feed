@@ -35,6 +35,13 @@ def build_requests insights
   requests.to_json
 end
 
+def get_description content
+  content = /<p>(?![<|&])(.+)(<br\s\/>|<\/p>)/.match content
+  description = content[0].gsub( %r{</?[^>]+?>}, '' )
+  description[0...100] if description.length > 100
+  description
+end
+
 rss = RSS::Parser.parse('http://insights.thoughtworkers.org/feed/', false)
 insights = []
 rss.items.each do |item|
@@ -47,10 +54,11 @@ rss.items.each do |item|
   hash['content'] = item.content_encoded
   hash['guid'] = item.guid.content
   hash['tags'] = item.categories.map {|category| category.content}
-  hash['description'] = item.description
+  hash['description'] = get_description item.content_encoded
 
   insights.push hash
 end
+
 
 requests = build_requests insights
 batch_send_requests requests
