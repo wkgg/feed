@@ -42,10 +42,22 @@ def get_description content
   description
 end
 
+def item_updated guid
+  File.open("guid", "r") do |file|
+    if (/p=(\d+)$/.match (guid.content))[1] > (/p=(\d+)$/.match (file.read))[1]
+      File.open("guid", "w"){|f| f.puts guid.content}
+    else
+      return true
+    end
+  end
+  return false
+end
+
 rss = RSS::Parser.parse('http://insights.thoughtworkers.org/feed/', false)
 insights = []
-rss.items.each do |item|
+rss.items.reverse.each do |item|
   hash = {}
+  next if item_updated item.guid
   hash['title'] = item.title
   hash['publishDate'] = {
                            "__type" => "Date",
@@ -58,7 +70,6 @@ rss.items.each do |item|
 
   insights.push hash
 end
-
+binding.pry
 
 requests = build_requests insights
-batch_send_requests requests
