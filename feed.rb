@@ -44,7 +44,7 @@ end
 
 def item_updated guid
   File.open("guid", "r") do |file|
-    if (/p=(\d+)$/.match (guid.content))[1] > (/p=(\d+)$/.match (file.read))[1]
+    if File.zero?("guid") || (/p=(\d+)$/.match (guid.content))[1] > (/p=(\d+)$/.match (file.read))[1]
       File.open("guid", "w"){|f| f.puts guid.content}
       return false
     else
