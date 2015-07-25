@@ -61,12 +61,12 @@ rss.items.reverse.each do |item|
   hash['title'] = item.title
   hash['publishDate'] = {
                            "__type" => "Date",
-                           "iso" => item.pubDate.iso8601.sub(/\+08:00/, ".123Z")
+                           "iso" => item.pubDate.iso8601.sub(/\+00:00/, ".123Z")
                         }
   hash['content'] = item.content_encoded
   hash['guid'] = item.guid.content
   hash['tags'] = item.categories.map {|category| category.content}
-  hash['description'] = get_description item.content_encoded
+  hash['description'] = item.description
 
   insights.push hash
 end
